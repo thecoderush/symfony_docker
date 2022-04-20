@@ -62,3 +62,9 @@ In docker-compose.yml, add the configuration below.
     services:
 
 version refers to the schema version. **services** defines the list of containers our application stack will consist of.   
+
+
+#### 3.2 Define the database container
+
+    *docker-compose.yml*
+
