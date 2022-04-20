@@ -90,6 +90,7 @@ In addition to scaffolding a container from the PHP-FPM image, we will do the fo
     *docker-compose.yml* for the database configuration.
     {code}
 
+
 #### 3.4 Define the Nginx container
 
 
@@ -119,3 +120,83 @@ This is a basic Nginx configuration required for running a Symfony project.
 Next, add the Nginx container's configuration to *docker-compose.yml*
     {code}
 
+
+#### 3.5 Build the containers
+
+    $ docker-compose up -d --build
+
+**!ALERT!**
+    
+At this stage you will encounter successful built but both nginx and mysql container will **Exited** code 1 immediatly due to **permission** issue.
+
+    $ docker ps
+    $ docker container ls -a
+
+You can log errors information
+
+    $ docker logs nginx
+    $ docker logs mysql
+
+Removing all unsued Docker objects
+    
+    $ docker system prune
+    
+This command removes all stopped containers, dangling images, and unused networks.
+
+Removing the php container as well 
+
+    $ docker stop php
+    $ docker rm php
+
+
+According to the error information, it is obvious that it is the problem of user permission. That's because **SELinux** (Security Extended Linux) cause "Permission denied" issue using docker.
+
+"I am using docker on RHEL 7. After mounting host directory into container, some interesting things happen: Although I am a root user, and seem to have all permissions, but the system will prompt “Permission denied” when executing commands" (or building with docker-compose in our case)
+
+the root cause is about SELinux:
+
+    $ getenforce
+    $ sestatus
+
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing
+Mode from config file:          enforcing
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Memory protection checking:     actual (secure)
+Max kernel policy version:      33
+
+
+[Debug Ref.]https://qdmana.com/2022/02/202202021639157801.html
+[Debug Ref.]https://www.cnblogs.com/activiti/p/7552677.html
+[Debug Ref.]https://nanxiao.me/en/selinux-cause-permission-denied-issue-in-using-docker/
+
+The **current mode** of SELinux is **enforcing**, ... resolve it:
+
+Set (as root) SELinux mode as *permissive*:
+
+    $ sudo setenforce 0
+
+...
+Current mode:                   permissive
+...
+
+Now you can execute docker-compose build command:
+
+    $ docker-compose up -d --build
+
+then,
+
+    $ docker ps
+
+CONTAINER ID   IMAGE                 COMMAND                  CREATED         STATUS         PORTS                                                  NAMES
+ebc8bbd13f3a   nginx:stable-alpine   "/docker-entrypoint.…"   5 seconds ago   Up 3 seconds   0.0.0.0:8080->80/tcp, :::8080->80/tcp                  nginx
+122b4108a83a   symfony_docker_php    "docker-php-entrypoi…"   6 seconds ago   Up 4 seconds   0.0.0.0:9000->9000/tcp, :::9000->9000/tcp              php
+c4a8ba129887   mysql:8.0             "docker-entrypoint.s…"   6 seconds ago   Up 5 seconds   33060/tcp, 0.0.0.0:4306->3306/tcp, :::4306->3306/tcp   database
+
+Our 3 containers are now up!
+
+**!ALERT!**
