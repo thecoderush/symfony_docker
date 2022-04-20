@@ -68,3 +68,21 @@ version refers to the schema version. **services** defines the list of container
 
     *docker-compose.yml*
 
+
+#### 3.3 Define the PHP container
+
+    $ mkdir php
+    $ touch php/Dockerfile
+
+    *symfony_docker/php/Dockerfile*
+
+Note: In the last two lines of symfony_docker/php/Dockerfile, please replace "you@example.com" with your email address and "Your Name" with your actual name.
+
+In addition to scaffolding a container from the PHP-FPM image, we will do the following:
+
+1.    Install the PHP extensions Symfony depends on.
+2.    Set the working directory of the container to /var/www/symfony_docker
+3.    Install composer
+4.    Install the Symfony CLI
+
+    *docker-compose.yml* for the database configuration.
