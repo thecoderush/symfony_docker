@@ -67,6 +67,7 @@ version refers to the schema version. **services** defines the list of container
 #### 3.2 Define the database container
 
     *docker-compose.yml*
+    {code}
 
 
 #### 3.3 Define the PHP container
@@ -75,6 +76,7 @@ version refers to the schema version. **services** defines the list of container
     $ touch php/Dockerfile
 
     *symfony_docker/php/Dockerfile*
+    {code}
 
 Note: In the last two lines of symfony_docker/php/Dockerfile, please replace "you@example.com" with your email address and "Your Name" with your actual name.
 
@@ -86,3 +88,34 @@ In addition to scaffolding a container from the PHP-FPM image, we will do the fo
 4.    Install the Symfony CLI
 
     *docker-compose.yml* for the database configuration.
+    {code}
+
+#### 3.4 Define the Nginx container
+
+
+**!ALERT!**
+
+    The following command: 
+    
+        $ $ mkdir -p nginx/default.conf
+
+    creates 2 folders unstead of a default.conf file into a nginx folder 
+
+    docker-compose up will make a warning or abort the container build because of non matching type mapping **volumes** 
+
+    You need to execute these instead:
+        $ mkdir nginx
+        $ touch nginx/default.conf
+
+**!ALERT!**
+
+    $ mkdir -p nginx/default.conf
+    
+Add the configuration to *nginx/default.conf*
+    {code}
+
+This is a basic Nginx configuration required for running a Symfony project.
+
+Next, add the Nginx container's configuration to *docker-compose.yml*
+    {code}
+
